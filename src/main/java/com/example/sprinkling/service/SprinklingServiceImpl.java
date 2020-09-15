@@ -1,11 +1,18 @@
 package com.example.sprinkling.service;
 
+import com.example.sprinkling.domain.sprinkling.entity.Sprinkling;
+import com.example.sprinkling.repository.SprinklingJpaRepository;
 import java.util.Arrays;
 import java.util.Random;
+import javax.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class SprinklingServiceImpl implements SprinklingService {
+
+  private final SprinklingJpaRepository sprinklingJpaRepository;
 
   //최소값
   final static int percentage[] = {30, 25, 18, 17};
@@ -29,6 +36,12 @@ public class SprinklingServiceImpl implements SprinklingService {
         money - Arrays.stream(result).sum();
 
     return result;
+  }
+
+  @Override
+  @Transactional
+  public Sprinkling save(Sprinkling sprinkling) {
+    return sprinklingJpaRepository.save(sprinkling);
   }
 
   //추가 가중치 값을 구한다

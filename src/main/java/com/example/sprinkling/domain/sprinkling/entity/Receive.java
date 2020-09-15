@@ -1,5 +1,6 @@
-package com.example.sprinkling.domain.sprinkling;
+package com.example.sprinkling.domain.sprinkling.entity;
 
+import com.example.sprinkling.domain.sprinkling.SprinklingStatus;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -42,5 +43,7 @@ public class Receive {
   //받은 날자
   @Column(name = "receive_Date")
   private LocalDateTime receiveDate;
+
+
 
 }

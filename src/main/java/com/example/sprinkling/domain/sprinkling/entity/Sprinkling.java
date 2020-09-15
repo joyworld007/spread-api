@@ -1,5 +1,6 @@
-package com.example.sprinkling.domain.sprinkling;
+package com.example.sprinkling.domain.sprinkling.entity;
 
+import com.example.sprinkling.domain.sprinkling.dto.SprinklingDto;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import javax.persistence.CascadeType;
@@ -25,6 +26,10 @@ public class Sprinkling {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  //룸 아이디
+  @Column(name = "room_id")
+  private String roomId;
 
   //토큰
   @Column(name = "token")
@@ -53,5 +58,20 @@ public class Sprinkling {
   //받는 사람 리스트
   @OneToMany(mappedBy = "sprinkling", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
   private Collection<Receive> receives;
+
+  protected Sprinkling(SprinklingDto dto) {
+    this.id = dto.getId();
+    this.roomId = dto.getRoomId();
+    this.token = dto.getToken();
+    this.userNo = dto.getUserNo();
+    this.money = dto.getMoney();
+    this.count = dto.getCount();
+    this.expireDate = LocalDateTime.now().plusMinutes(10L);
+    this.createDate = LocalDateTime.now();
+  }
+
+  public static Sprinkling ofDto(SprinklingDto dto) {
+    return new Sprinkling(dto);
+  }
 
 }
