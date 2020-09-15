@@ -29,28 +29,41 @@ REST API 기반 뿌리기 서비스
 
 ### <a name="chapter-3"></a>Strategy 
 ```` 
-- Embedded H2 DB, Embedded Redis 를 사용
+- Embedded H2 DB
+- Embedded Redis
+- REDIS를 이용하여 CQRS(Command and Query Responsibility Segregation) 패턴 구현
 - 랜덤한 토큰 생성
-- REDIS를 이용하여 CQRS(Command and Query Responsibility Segregation) 패턴 구현 
 ````
 
 ## <a name="chapter-4"></a>Entity
 ```
-쿠폰(Coupon) 
-   쿠폰번호
-   쿠폰상태
+뿌리기(Sprinkling) 
+   아이디
+   토큰
+   생성한 유저 아이디
+   금액
+   받을사용자 수 
+   만료일자
+   생성일자  
+   
+받기(Sprinkling_Receive)
+   아디디
+   뿌리기 아이디
+   금액
+   상태(받기대기/받기완료)
+   받은사람아이디
+
+사용자(User) 
    유저아이디
-   만료일
-   생성일   
-   사용일
-   발급일
+   유저이메일
+   생성일자  
+   사용자아이디
 
 ```
 
 ### <a name="chapter-5"></a>Redis Key
 ````
-- 쿠폰( key : 쿠폰 ID, type : 쿠폰 )  
-- 해당 일자에 만료되는 쿠폰(key : 만료일자, type : 쿠폰 ID 리스트)
+- 뿌리기( key : 뿌리기 ID, type : 뿌리기 DTO )  
 ````
 
 ### <a name="chapter-6"></a>Explanation of REST 
@@ -63,42 +76,23 @@ REST API 기반 뿌리기 서비스
 
 ### <a name="chapter-7"></a>Api Feature list 
 ```
-- 랜덤한 코드의 쿠폰을 N개 생성하여 데이터베이스에 보관
+- 뿌리기 생성
+- 뿌린 금액 받기
+- 뿌리기 조회 하기
 ``` 
 
 ### <a name="chapter-8"></a>Api Endpoint
 ```
-API 실행 && 테스트 절차
-1. 회원가입을 합니다 
-2. 로그인 후 인증 토큰을 받습니다
-3. Header userId, Authorization Header Bearer Token 값을 넣고 각 Coupon API를 호출합니다
 
-EndPoint : /v1/coupons/{id}
-Method : PUT 
-Description : 생성된 쿠폰중 하나를 사용자에게 지급 
-              사용자에게 지급한 쿠폰을 사용
-              사용된 쿠폰을 사용 취소
-Return value: HTTP status 200 (OK), 404 (NOT_FOUND)
-
-|-----------|--------------|---------------------------------------------------|
-| Parameter |Parameter Type| Description                                       |
-|-----------|--------------|---------------------------------------------------|
-| id        | @PathParam   | Coupon id                                         |
-|-----------|--------------|---------------------------------------------------|
+EndPoint : /v1/sprinkling
+Method : POST
+Description : 뿌리기 하나를 생성 
+Return value: HTTP status 200 (OK)
 
 Payload Example (required parameters)
-뿌리기 하나를 생성 
 {
-    "status" : "ISSUED",
-    "userId" : "joyworld007"
-}
-사용자에게 지급한 쿠폰을 사용
-{
-    "status" : "USED"
-}
-사용된 쿠폰을 사용 취소
-{
-    "status" : "ISSUED"
+    "money" : "10000",
+    "count" : "5"
 }
 
 Response Body example
@@ -107,11 +101,7 @@ Response Body example
     "code": "SUCCESS",
     "message": "OK"
 }            
-뿌리기 만료시
-{
-    "code": "EXPIRED",
-    "message": "Expired"
-}
+
 요청 조건이 맞지 않을시   
 {
     "code": "BAD_REQUEST",
@@ -120,15 +110,15 @@ Response Body example
 
 ----------------------------------------------------------------------------------------------------
 
-EndPoint : /v1/Sprinkling/{id}
+EndPoint : /v1/sprinkling/{id}
 Method : GET
-Description : 쿠폰 정보 조회 ( CQRS 성능 테스트 용 )
+Description : 뿌리기 정보 조회
 Return value: HTTP status 200 (OK) 
 
 |-----------|--------------|---------------------------------------------------|
 | Parameter |Parameter Type| Description                                       |
 |-----------|--------------|---------------------------------------------------|
-| id        | @PathParam   | Coupon id                                         |
+| id        | @PathParam   | sprinkling id                                         |
 |-----------|--------------|---------------------------------------------------|
 
 ```
