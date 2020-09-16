@@ -1,15 +1,20 @@
 package com.example.sprinkling.service;
 
+import com.example.sprinkling.domain.common.CommonResponseDto;
+import com.example.sprinkling.domain.common.ResultCode;
 import com.example.sprinkling.domain.sprinkling.SprinklingStatus;
 import com.example.sprinkling.domain.sprinkling.dto.ReceiveDto;
 import com.example.sprinkling.domain.sprinkling.entity.Receive;
 import com.example.sprinkling.domain.sprinkling.entity.Sprinkling;
 import com.example.sprinkling.repository.SprinklingJpaRepository;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -64,8 +69,56 @@ public class SprinklingServiceImpl implements SprinklingService {
   }
 
   @Override
-  public Sprinkling receive(Long id, Long userNo) {
-    return null;
+  @Transactional
+  public CommonResponseDto receive(Long id, String roomId, String token, Long userNo) {
+    Optional<Sprinkling> sprinkling = sprinklingJpaRepository.findByIdAndToken(id, token);
+    if (sprinkling.isPresent()) {
+      if (!sprinkling.get().getRoomId().equals(roomId)) {
+        return CommonResponseDto.builder().code(ResultCode.ROOM_ID_IS_NOT_INVALID.toString())
+            .message("Room Id Invalid").build();
+      } else {
+        List<Receive> receives = sprinkling.get().getReceives().stream()
+            .collect(Collectors.toList());
+
+        //아직 남아 있는 것이 없다면...
+        if (receives.stream()
+            .filter(t -> t.getStatus().equals(SprinklingStatus.READY)).count() == 0) {
+          return CommonResponseDto.builder().code(ResultCode.FINISH.toString()).build();
+        }
+
+        System.out.println("userNo : " + userNo);
+
+        System.out.println("이미 지급 카운트 : " + receives.stream()
+            .filter(t -> t.getUserNo() != null && t.getUserNo().equals(userNo)).count());
+
+        //이미 지급 된 유저라면
+        if (receives.stream()
+            .filter(t -> t.getUserNo() != null && t.getUserNo().equals(userNo)).count() > 0) {
+          return CommonResponseDto.builder().code(ResultCode.ALREADY_ACCEPTED.toString()).build();
+        }
+
+        //당첨 index
+        int winIndex = -1;
+        while (winIndex < 0) {
+          Random rd = new Random();
+          int index = rd.nextInt(sprinkling.get().getReceives().size());
+          if (!receives.get(index).getStatus().equals(SprinklingStatus.READY)) continue;
+          winIndex = index;
+        }
+
+        // 금액을 지급한다.
+        receives.get(winIndex).setStatus(SprinklingStatus.COMPLETE);
+        receives.get(winIndex).setUserNo(userNo);
+        receives.get(winIndex).setReceiveDate(LocalDateTime.now());
+        sprinkling.get().getReceives().clear();
+        sprinkling.get().getReceives().addAll(receives);
+
+        return CommonResponseDto.builder().code(ResultCode.SUCCESS.toString()).build();
+      }
+    }
+    return CommonResponseDto.builder().code(ResultCode.NOT_FOUND.toString())
+        .message("Not Found").build();
+
   }
 
   @Override

@@ -1,5 +1,7 @@
 package com.example.sprinkling.service;
 
+import com.example.sprinkling.domain.common.CommonResponseDto;
+import com.example.sprinkling.domain.common.Result;
 import com.example.sprinkling.domain.sprinkling.entity.Sprinkling;
 import java.util.Optional;
 import javax.transaction.Transactional;
@@ -14,7 +16,7 @@ public interface SprinklingService {
   public Sprinkling save(Sprinkling sprinkling);
 
   @Transactional
-  public Sprinkling receive(Long id, Long userNo);
+  public CommonResponseDto<Sprinkling> receive(Long id, String roomId, String token, Long userNo);
 
   public Optional<Sprinkling> findbyIdAndUserId(Long id, Long userId);
 
