@@ -1,9 +1,12 @@
 package com.example.sprinkling.domain.sprinkling.entity;
 
 import com.example.sprinkling.domain.sprinkling.SprinklingStatus;
+import com.example.sprinkling.domain.sprinkling.dto.ReceiveDto;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,11 +16,13 @@ import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Table(name = "receive")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Setter
 public class Receive {
 
   @Id
@@ -34,16 +39,27 @@ public class Receive {
 
   //상태
   @Column(name = "status")
+  @Enumerated(EnumType.STRING)
   private SprinklingStatus status;
 
   //받은 유저
-  @Column(name = "user_id")
-  private long receiveUserId;
+  @Column(name = "user_no")
+  private Long userNo;
 
   //받은 날자
-  @Column(name = "receive_Date")
+  @Column(name = "receive_date")
   private LocalDateTime receiveDate;
 
+  protected Receive(ReceiveDto dto) {
+    this.id = dto.getId();
+    this.amount = dto.getAmount();
+    this.status = dto.getStatus();
+    this.userNo = dto.getUserId();
+    this.receiveDate = dto.getReceiveDate();
+  }
 
+  public static Receive ofDto(ReceiveDto dto) {
+    return new Receive(dto);
+  }
 
 }

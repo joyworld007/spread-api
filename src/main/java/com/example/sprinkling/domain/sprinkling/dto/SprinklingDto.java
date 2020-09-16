@@ -10,9 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.redis.core.RedisHash;
 
-@RedisHash("sprinkling")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,15 +23,29 @@ public class SprinklingDto {
 
   private String roomId;
   private String token;
-  private Long userNo;
+  private Long userId;
   private Long money;
+  private Long max;
   private int count;
   private LocalDateTime expireDate;
   private LocalDateTime createDate;
-  private Collection<ReceiveDto> receivesDto;
+  private Collection<ReceiveDto> receives;
 
   protected SprinklingDto(Sprinkling entity) {
-    receivesDto = entity.getReceives().stream().map(s -> ReceiveDto.ofEntity(s))
+    this.id = entity.getId();
+    this.roomId = entity.getRoomId();
+    this.token = entity.getToken();
+    this.userId = entity.getUserId();
+    this.money = entity.getMoney();
+    this.max = entity.getMax();
+    this.count = entity.getCount();
+    this.expireDate = LocalDateTime.now().plusMinutes(10L);
+    this.createDate = LocalDateTime.now();
+    receives = entity.getReceives().stream().map(s -> ReceiveDto.ofEntity(s))
         .collect(Collectors.toList());
+  }
+
+  public static SprinklingDto ofEntity(Sprinkling entity) {
+    return new SprinklingDto(entity);
   }
 }

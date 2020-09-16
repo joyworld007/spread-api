@@ -22,13 +22,13 @@ public class SprinklingServiceTest {
   public void readom_money_sum_test() {
     int money = 10000;
     long result[];
-    result = sprinklingService.calculationSprinkling(2, money);
+    result = sprinklingService.createSprinkling(2, money);
     Assertions.assertEquals(money, Arrays.stream(result).sum());
-    result = sprinklingService.calculationSprinkling(3, money);
+    result = sprinklingService.createSprinkling(3, money);
     Assertions.assertEquals(money, Arrays.stream(result).sum());
-    result = sprinklingService.calculationSprinkling(4, money);
+    result = sprinklingService.createSprinkling(4, money);
     Assertions.assertEquals(money, Arrays.stream(result).sum());
-    result = sprinklingService.calculationSprinkling(5, money);
+    result = sprinklingService.createSprinkling(5, money);
     Assertions.assertEquals(money, Arrays.stream(result).sum());
   }
 }

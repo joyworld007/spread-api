@@ -1,8 +1,14 @@
 package com.example.sprinkling.service;
 
+import com.example.sprinkling.domain.sprinkling.SprinklingStatus;
+import com.example.sprinkling.domain.sprinkling.dto.ReceiveDto;
+import com.example.sprinkling.domain.sprinkling.entity.Receive;
 import com.example.sprinkling.domain.sprinkling.entity.Sprinkling;
 import com.example.sprinkling.repository.SprinklingJpaRepository;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
 import java.util.Random;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,16 +28,16 @@ public class SprinklingServiceImpl implements SprinklingService {
   final static int weight4[] = {3, 7};
   final static int weight5[] = {2, 3};
 
-  public long[] calculationSprinkling(int count, long money) {
+  public long[] createSprinkling(int count, long money) {
     long result[] = new long[count];
     //퍼센티지 별 금액을 구한다.
     for (int i = 0; i < count; i++) {
       int addWeight = getAddWeight(count);
       result[i] = (money * ((percentage[count - 2] + addWeight))) / 100;
     }
-    //오름차순으로 정렬 한뒤
+    //오름차순으로 정렬
     Arrays.sort(result);
-    //남은 금액을 1등에게 몰아 준다
+    //남은 금액을 1등에게 할당
     result[count - 1] = result[count - 1] +
         money - Arrays.stream(result).sum();
 
@@ -41,10 +47,48 @@ public class SprinklingServiceImpl implements SprinklingService {
   @Override
   @Transactional
   public Sprinkling save(Sprinkling sprinkling) {
+    long[] receive = createSprinkling(sprinkling.getCount(),
+        sprinkling.getMoney());
+    sprinkling.setToken(createToken());
+    Collection<Receive> receives = new ArrayList<>();
+    Arrays.stream(receive)
+        .forEach(s ->
+            receives.add(Receive.ofDto(ReceiveDto.builder()
+                .amount(s).status(SprinklingStatus.READY).build())));
+    for (Receive r : receives) {
+      r.setSprinkling(sprinkling);
+    }
+    sprinkling.setReceives(receives);
+    sprinkling.setMax(receive[receive.length - 1]);
     return sprinklingJpaRepository.save(sprinkling);
   }
 
-  //추가 가중치 값을 구한다
+  @Override
+  public Sprinkling receive(Long id, Long userNo) {
+    return null;
+  }
+
+  @Override
+  public Optional<Sprinkling> findbyIdAndUserId(Long id, Long userId) {
+    return sprinklingJpaRepository.findByIdAndUserId(id, userId);
+  }
+
+  @Override
+  public Optional<Sprinkling> findbyIdAndToken(Long id, String token) {
+    return sprinklingJpaRepository.findByIdAndToken(id, token);
+  }
+
+  @Override
+  public String createToken() {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < 3; i++) {
+      Random rand = new Random();
+      char uc = (char) (rand.nextInt(26) + 'A');
+      sb.append(uc);
+    }
+    return sb.toString();
+  }
+
   public int getAddWeight(int count) {
     Random rd = new Random();
     switch (count) {
@@ -58,6 +102,5 @@ public class SprinklingServiceImpl implements SprinklingService {
         return rd.nextInt(weight2[0]) + (weight2[1] - weight2[0]);
     }
   }
-
 
 }

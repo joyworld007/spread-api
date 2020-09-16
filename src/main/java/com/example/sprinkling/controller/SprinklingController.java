@@ -1,15 +1,20 @@
 package com.example.sprinkling.controller;
 
 import com.example.sprinkling.domain.common.CommonResponseEntity;
+import com.example.sprinkling.domain.common.Result;
+import com.example.sprinkling.domain.sprinkling.converter.SprinklingConverter;
 import com.example.sprinkling.domain.sprinkling.dto.SprinklingDto;
+import com.example.sprinkling.domain.sprinkling.entity.Sprinkling;
 import com.example.sprinkling.service.SprinklingService;
-import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,10 +27,32 @@ public class SprinklingController {
   private final SprinklingService sprinklingService;
 
   @PostMapping
-  public ResponseEntity create(@RequestBody SprinklingDto sprinklingDto)
-      throws Exception {
-    //sprinklingService.save(sprinklingDto);
-    return CommonResponseEntity.created();
+  public ResponseEntity create(
+      @RequestHeader(value = "X-USER-ID") Long userId
+      , @RequestHeader(value = "X-ROOM-ID") String roomId
+      , @RequestBody SprinklingDto sprinklingDto) throws Exception {
+
+    Sprinkling sprinkling = new SprinklingConverter().convertFromDto(sprinklingDto);
+    sprinkling.setUserId(userId);
+    sprinkling.setRoomId(roomId);
+    sprinklingService.save(sprinkling);
+    return CommonResponseEntity.ok(Result.builder().entry(
+        SprinklingDto.ofEntity(sprinkling)
+    ).build());
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity findById(
+      @RequestHeader(value = "X-USER-ID") Long userId
+      , @RequestHeader(value = "X-ROOM-ID") String roomId
+      , @PathVariable(value = "id") Long id) throws Exception {
+    Optional<Sprinkling> sprinkling = sprinklingService.findbyIdAndUserId(id, userId);
+    if(sprinkling.isPresent()) {
+      return CommonResponseEntity.ok(Result.builder().entry(
+          SprinklingDto.ofEntity(sprinkling.get())
+      ).build());
+    }
+    return CommonResponseEntity.notFound();
   }
 
 }

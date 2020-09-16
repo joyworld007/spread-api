@@ -1,15 +1,25 @@
 package com.example.sprinkling.service;
 
 import com.example.sprinkling.domain.sprinkling.entity.Sprinkling;
+import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
 public interface SprinklingService {
 
-  long[] calculationSprinkling(int count, long money);
+  long[] createSprinkling(int count, long money);
 
   @Transactional
   public Sprinkling save(Sprinkling sprinkling);
+
+  @Transactional
+  public Sprinkling receive(Long id, Long userNo);
+
+  public Optional<Sprinkling> findbyIdAndUserId(Long id, Long userId);
+
+  public Optional<Sprinkling> findbyIdAndToken(Long id, String token);
+
+  public String createToken();
 
 }
