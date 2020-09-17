@@ -73,8 +73,10 @@ REST API 기반 뿌리기 서비스
 ### <a name="chapter-7"></a>Api Endpoint
 ```
 공통 Request Header
-X-USER-ID" : 유저 아이디
-"X-ROOM-ID" : 룸 아이디
+{
+    "X-USER-ID" : 유저 아이디
+    "X-ROOM-ID" : 룸 아이디
+}
 
 EndPoint : /v1/sprinkling
 Method : POST
