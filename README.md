@@ -52,7 +52,7 @@ REST API 기반 뿌리기 서비스
     받을금액
     상태(받기대기/받기완료)
     받은유저
-    받은잘자
+    받은날자
 ```
 
 ### <a name="chapter-5"></a>Explanation of REST 
