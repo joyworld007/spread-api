@@ -1,4 +1,4 @@
-## Sprinkling
+## 카카오 페이 뿌리기 서비스
 
 ## Contents
 * [Specifications](#chapter-1)
@@ -41,7 +41,7 @@ REST API 기반 뿌리기 서비스
     토큰
     유저넘버
     금액
-    최고가금
+    최고받기금액
     받을사람수
     만료일
     생성일
