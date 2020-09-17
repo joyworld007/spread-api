@@ -70,38 +70,41 @@ public class SprinklingServiceImpl implements SprinklingService {
 
   @Override
   @Transactional
-  public CommonResponseDto receive(Long id, String roomId, String token, Long userNo) {
+  public CommonResponseDto receive(Long id, String roomId, String token, Long userId) {
     Optional<Sprinkling> sprinkling = sprinklingJpaRepository.findByIdAndToken(id, token);
 
     //뿌리기 정보를 체크
     if (!sprinkling.isPresent()) {
       return CommonResponseDto.builder().code(ResultCode.NOT_FOUND.toString())
-          .message("Not Found").build();
+          .message("Not found").build();
     }
 
     //유효기간 만료 체크
     if (sprinkling.get().getExpireDate().isBefore(LocalDateTime.now())) {
       return CommonResponseDto.builder().code(ResultCode.EXPIRED.toString())
-          .message("EXPIRED").build();
+          .message("Expired").build();
     }
 
     //룸 아이디 체크
     if (!sprinkling.get().getRoomId().equals(roomId)) {
       return CommonResponseDto.builder().code(ResultCode.ROOM_ID_IS_NOT_INVALID.toString())
-          .message("Room Id Invalid").build();
+          .message("Room id is not Invalid").build();
     }
 
     //모든 뿌리기가 완료 되었는지 체크
     List<Receive> receives = sprinkling.get().getReceives().stream()
         .collect(Collectors.toList());
     if (receives.stream().filter(t -> t.getStatus().equals(SprinklingStatus.READY)).count() == 0) {
-      return CommonResponseDto.builder().code(ResultCode.FINISH.toString()).build();
+      return CommonResponseDto.builder().code(ResultCode.FINISHED.toString())
+          .message("sprinkling is finished").build();
     }
 
     //이미 지급 된 유저인지 체크
     if (receives.stream()
-        .filter(t -> t.getUserNo() != null && t.getUserNo().equals(userNo)).count() > 0) {
-      return CommonResponseDto.builder().code(ResultCode.ALREADY_ACCEPTED.toString()).build();
+        .filter(t -> t.getUserId() != null && t.getUserId().equals(userId)).count() > 0) {
+      return CommonResponseDto.builder().code(ResultCode.ALREADY_ACCEPTED.toString())
+          .message("Already accepted")
+          .build();
     }
 
     //랜덤하게 당첨 될 index를 구
@@ -117,7 +120,7 @@ public class SprinklingServiceImpl implements SprinklingService {
 
     //뿌리기 받기
     receives.get(winIndex).setStatus(SprinklingStatus.COMPLETE);
-    receives.get(winIndex).setUserNo(userNo);
+    receives.get(winIndex).setUserId(userId);
     receives.get(winIndex).setReceiveDate(LocalDateTime.now());
     sprinkling.get().getReceives().clear();
     sprinkling.get().getReceives().addAll(receives);

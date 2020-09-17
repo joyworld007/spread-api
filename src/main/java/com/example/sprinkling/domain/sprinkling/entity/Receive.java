@@ -43,8 +43,8 @@ public class Receive {
   private SprinklingStatus status;
 
   //받은 유저
-  @Column(name = "user_no")
-  private Long userNo;
+  @Column(name = "user_id")
+  private Long userId;
 
   //받은 날자
   @Column(name = "receive_date")
@@ -54,7 +54,7 @@ public class Receive {
     this.id = dto.getId();
     this.amount = dto.getAmount();
     this.status = dto.getStatus();
-    this.userNo = dto.getUserId();
+    this.userId = dto.getUserId();
     this.receiveDate = dto.getReceiveDate();
   }
 

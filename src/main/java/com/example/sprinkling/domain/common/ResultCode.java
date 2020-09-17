@@ -11,7 +11,7 @@ public enum ResultCode {
   USER_NOT_FOUND,
 
   ALREADY_ACCEPTED,
-  FINISH,
+  FINISHED,
   EXPIRED,
 
 }

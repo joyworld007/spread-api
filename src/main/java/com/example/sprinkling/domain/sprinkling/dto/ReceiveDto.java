@@ -26,7 +26,7 @@ public class ReceiveDto {
     this.id = entity.getId();
     this.amount = entity.getAmount();
     this.status = entity.getStatus();
-    this.userId = entity.getUserNo();
+    this.userId = entity.getUserId();
     this.receiveDate = entity.getReceiveDate();
   }
   public static ReceiveDto ofEntity(Receive entity) {

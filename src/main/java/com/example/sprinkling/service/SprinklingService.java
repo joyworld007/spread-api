@@ -16,7 +16,7 @@ public interface SprinklingService {
   public Sprinkling save(Sprinkling sprinkling);
 
   @Transactional
-  public CommonResponseDto<Sprinkling> receive(Long id, String roomId, String token, Long userNo);
+  public CommonResponseDto<Sprinkling> receive(Long id, String roomId, String token, Long userId);
 
   public Optional<Sprinkling> findbyIdAndUserId(Long id, Long userId);
 

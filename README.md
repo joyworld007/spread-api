@@ -5,11 +5,10 @@
 * [Requirement](#chapter-2) 
 * [Strategy](#chapter-3)
 * [Entity](#chapter-4)
-* [Redis Key](#chapter-5)
-* [Explanation of REST](#chapter-6)
-* [Api Feature list](#chapter-7)
-* [Api Endpoint](#chapter-8)
-* [How to run](#chapter-9)
+* [Explanation of REST](#chapter-5)
+* [Api Feature list](#chapter-6)
+* [Api Endpoint](#chapter-7)
+* [How to run](#chapter-8)
 
 
 ### <a name="chapter-1"></a>Specifications 
@@ -38,30 +37,26 @@ REST API 기반 뿌리기 서비스
 ## <a name="chapter-4"></a>Entity
 ```
 뿌리기(Sprinkling) 
-   아이디
-   토큰
-   룸아이디
-   유저넘버
-   금액
-   받을사람수
-   만료일
-   생성일
+    아이디
+    룸아이디   
+    토큰
+    유저넘버
+    금액
+    최고가금
+    받을사람수
+    만료일
+    생성일
    
 뿌리기 받기(Receive)
-   아디디
-   뿌리기 아이디
-   금액
-   상태(받기대기/받기완료)
-   받은사람아이디
-
+    아디디
+    뿌리기 아이디
+    받을금액
+    상태(받기대기/받기완료)
+    받은유저
+    받은잘자
 ```
 
-### <a name="chapter-5"></a>Redis Key
-````
-- 뿌리기( key : 뿌리기 ID, type : 뿌리기 DTO )  
-````
-
-### <a name="chapter-6"></a>Explanation of REST 
+### <a name="chapter-5"></a>Explanation of REST 
 |HTTP Method|Usage|
 |:---|:---|
 |GET   |Receive a read-only data      |
@@ -69,25 +64,29 @@ REST API 기반 뿌리기 서비스
 |POST  |Creates a new resource        |
 |DELETE|Deletes the given resource    |
 
-### <a name="chapter-7"></a>Api Feature list 
+### <a name="chapter-6"></a>Api Feature list 
 ```
 - 뿌리기 생성
 - 뿌린 금액 받기
 - 뿌리기 조회 하기
 ``` 
 
-### <a name="chapter-8"></a>Api Endpoint
+### <a name="chapter-7"></a>Api Endpoint
 ```
+공통 Request Header
+X-USER-ID" : 유저 아이디
+"X-ROOM-ID" : 룸 아이디
 
 EndPoint : /v1/sprinkling
 Method : POST
-Description : 뿌리기 하나를 생성 
-Return value: HTTP status 200 (OK)
+Description : 뿌리기 생성 
+Return value: HTTP status 200 (OK), 400 (BAD Request)
 
 Payload Example (required parameters)
 {
-    "money" : "10000",
-    "count" : "5"
+	"roomId" : "12345",
+    "count" : "5",
+    "money" : "1000"
 }
 
 Response Body example
@@ -110,14 +109,56 @@ Method : GET
 Description : 뿌리기 정보 조회
 Return value: HTTP status 200 (OK) 
 
-|-----------|--------------|---------------------------------------------------|
-| Parameter |Parameter Type| Description                                       |
-|-----------|--------------|---------------------------------------------------|
-| id        | @PathParam   | sprinkling id                                         |
-|-----------|--------------|---------------------------------------------------|
+|-----------|---------------|---------------------------------------------------|
+| Parameter |Parameter Type | Description                                       |
+|-----------|---------------|---------------------------------------------------|
+| id        | @PathParam    | sprinkling id                                     |
+|-----------|---------------|---------------------------------------------------|
 
+---------------------------------------------------------------------------------------------------
+
+EndPoint : /v1/sprinkling/{id}
+Method : PUT
+Description : 뿌리기 금액 받기
+Return value: HTTP status 200 (OK) 
+
+|-----------|---------------|---------------------------------------------------|
+| Parameter |Parameter Type| Description                                        |
+|-----------|---------------|---------------------------------------------------|
+| id        | @PathParam    | sprinkling id                                     |
+|-----------|---------------|---------------------------------------------------|
+| token     | @RequestParam | token                                             |
+|-----------|---------------|---------------------------------------------------|
+Response Body example
+성공시 
+{
+    "code": "SUCCESS",
+    "message": "OK"
+}  
+
+실패시 
+{
+    "code": "EXPIRED",
+    "message": "Expired"
+}  
+{
+    "code": "NOT_FOUND",
+    "message": "Not found"
+}  
+{
+    "code": "ROOM_ID_IS_NOT_INVALID",
+    "message": "Room id is not Invalid"
+}  
+{
+    "code": "FINISHED",
+    "message": "sprinkling is finished"
+}  
+{
+    "code": "ALREADY_ACCEPTED",
+    "message": "Already accepted"
+}  
 ```
-### <a name="chapter-9"></a>How to Run
+### <a name="chapter-8"></a>How to Run
 ```
 1. 실행
 ./gradlew bootrun

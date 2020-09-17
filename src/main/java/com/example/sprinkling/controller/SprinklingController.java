@@ -31,7 +31,7 @@ public class SprinklingController {
   private final SprinklingService sprinklingService;
 
   @PostMapping
-  public ResponseEntity createSprinklingInfo(
+  public ResponseEntity createSprinkling(
       @RequestHeader(value = "X-USER-ID") Long userId
       , @RequestHeader(value = "X-ROOM-ID") String roomId
       , @RequestBody SprinklingDto sprinklingDto) throws Exception {
@@ -60,7 +60,7 @@ public class SprinklingController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity reveiveSprinkling(
+  public ResponseEntity receiveMoney(
       @RequestHeader(value = "X-USER-ID") Long userId
       , @RequestHeader(value = "X-ROOM-ID") String roomId
       , @PathVariable(value = "id") Long id
