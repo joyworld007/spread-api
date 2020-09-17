@@ -16,22 +16,21 @@
  OpenJDK11
  Spring Boot 2.3.3.RELEASE
  Spring Data Jpa
- Spring Data Redis
+ Embedded H2 DB
  Swagger2
- CQRS Pettern
 ````
 ### <a name="chapter-2"></a>Requirement 
 ````
 REST API 기반 뿌리기 서비스
-- 
+- 뿌리기, 받기, 조회 기능을 수행하는 REST API를 구현
 ````
 
 ### <a name="chapter-3"></a>Strategy 
 ```` 
-- Embedded H2 DB
-- Embedded Redis
-- REDIS를 이용하여 CQRS(Command and Query Responsibility Segregation) 패턴 구현
-- 랜덤한 토큰 생성
+- Embedded H2 DB를 사용
+- Spring data jpa를 이용하여 데이터 Read, Write
+- Junit5를 이용한 단위 테스트 코드 작성
+- 인원 별로 기본 가중치, 추가 가중치를 두어 랜덤한 받기 금액 생성
 ````
 
 ## <a name="chapter-4"></a>Entity

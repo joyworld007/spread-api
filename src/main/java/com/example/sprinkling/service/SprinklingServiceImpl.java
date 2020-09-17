@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class SprinklingServiceImpl implements SprinklingService {
 
   private final SprinklingJpaRepository sprinklingJpaRepository;
@@ -107,7 +108,7 @@ public class SprinklingServiceImpl implements SprinklingService {
           .build();
     }
 
-    //랜덤하게 당첨 될 index를 구
+    //랜덤하게 당첨 될 index를 구함
     int winIndex = -1;
     while (winIndex < 0) {
       Random rd = new Random();
@@ -118,21 +119,36 @@ public class SprinklingServiceImpl implements SprinklingService {
       winIndex = index;
     }
 
-    //뿌리기 받기
+    //뿌리기 금액 받기
     receives.get(winIndex).setStatus(SprinklingStatus.COMPLETE);
     receives.get(winIndex).setUserId(userId);
     receives.get(winIndex).setReceiveDate(LocalDateTime.now());
     sprinkling.get().getReceives().clear();
     sprinkling.get().getReceives().addAll(receives);
 
-    return CommonResponseDto.builder().code(ResultCode.SUCCESS.toString()).build();
+    return CommonResponseDto.builder().code(ResultCode.SUCCESS.toString()).message("OK").build();
   }
 
+  /**
+   * 뿌리기 데이터 조회
+   * 자신이 생성한 뿌리기와 7일이내 생성된 뿌리기만 조회 가능
+   * @param id
+   * @param userId
+   * @return
+   */
   @Override
   public Optional<Sprinkling> findbyIdAndUserId(Long id, Long userId) {
-    return sprinklingJpaRepository.findByIdAndUserId(id, userId);
+    return sprinklingJpaRepository.findByIdAndUserIdAndCreateDateBetween(id, userId,
+        LocalDateTime.now().minusDays(7), LocalDateTime.now());
   }
 
+  /**
+   * 뿌리기 금액 받기를 위한 조회
+   * 분산 환경과 동시성을 고려한 Lock 기법 사용 (PESSIMISTIC_WRITE)
+   * @param id
+   * @param token
+   * @return
+   */
   @Override
   public Optional<Sprinkling> findbyIdAndToken(Long id, String token) {
     return sprinklingJpaRepository.findByIdAndToken(id, token);
