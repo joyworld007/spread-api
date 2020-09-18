@@ -85,7 +85,7 @@ Return value: HTTP status 200 (OK), 400 (BAD Request)
 
 Payload Example (required parameters)
 {
-	"roomId" : "12345",
+    "roomId" : "12345",
     "count" : "5",
     "money" : "1000"
 }
